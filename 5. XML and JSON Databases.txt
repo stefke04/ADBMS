@@ -1,0 +1,837 @@
+Okay, good afternoon. Two elements on the plan for today. On the one hand, we'll be
+discussing some sample questions from the first two chapters, but that will be
+after the break. And apart from that, we'll be discussing document-oriented
+database systems. Although my account needs attention, pay attention later.
+Although we'll see that actually you'll be able to store these kinds of data in
+relational databases as well, and so the chapter will also be about how to cope
+with that in a relational setting. But so the main focus of the document-oriented
+aspect is two formats, XML and JSON. Anyone familiar with XML or JSON or
+heard about it? And in what sense? Familiar in the sense when used it or
+heard about it? Yeah, XML or JSON or both, yeah. So there's a lot to be said about it and
+actually the main purpose of XML and JSON is data interchange. So it can also
+be used as a storage format, but that's not the main purpose. But of course from
+the perspective of database management, we'll be looking at how to cope with
+these kinds of data in a database setting, both in a dedicated setting and
+in a relational setting, regardless of whether you will be using it, but
+probably you will as an exchange format as well. But in the sense of storage, the
+main purpose is the ability to store what is called semi-structured data. So
+as you will see, there is some structure in it, but it's more volatile and more
+flexible than what you have for instance in a relational database. We first
+start with XML, but the division of topics for JSON will be actually very
+similar to allow you also allow you to compare a lot of things and in the end
+they're two different languages. The syntax is different of course, but a lot
+of the concepts are very similar. XML is already longer on the market, it's more
+mature, has also a wider ecosystem in terms of really enterprise systems. JSON
+is more recent, it's also a bit less fair-bore, it's smaller documents. And in
+the programming context and also in the context of NoSQL databases, which we'll
+be discussing after this chapter, it's more prevalent than XML. But it's good to
+see both and also see that actually apart from the syntax and some whistles
+and bells, there's a lot a lot a lot of similarities between the two. So what
+we'll be discussing about XML, first just introduce the format a bit, but we can do
+that quite quickly if you've already been introduced to it, but we'll mainly
+focus on the storage and structural aspects of it. We'll also see that XML
+comes with a whole ecosystem of specifications, so we'll look at how you
+can process XML documents, the APIs you use to do that, how you can store them,
+which is of course a main purpose of this course and these sessions. And I
+will also see how you can actually map them to relational storage, because again
+just like relational databases survived a lot of new trends by incorporating
+functionality such as the object-oriented aspect, they also
+incorporated XML and JSON capabilities in different possible ways, which we'll be
+discussing as well. And then we'll close with discussing how to search XML and I
+guess in the business information systems course you didn't focus on XML
+query languages or so. So we see that actually just like you have a query
+language SQL for relational databases, you also have a query language for XML
+data, which to some extent is similar to SQL, but the main difference is that you
+also take the hierarchy structure of your document into account, which you
+don't have in a relational setting of course. And then we'll move on to JSON
+and to save you the trouble of reading the slides, I didn't repeat everything
+but actually the same concepts are repeated for JSON as well. And as we will
+see we'll discuss it both from the context of storing JSON and XML in
+native facilities and then we speak of document stores or XML databases and in
+the context of JSON we typically speak of no see one particular kind of no SQL
+databases which is the focus of the next chapter, but we'll also look at storage
+in a relational and object relational setting. Before we get to that were there
+any questions about last week's, no not last week's, but Tuesday session? You
+looked eager to ask a question but you're not. You were sick okay but you're
+better now. Great. I heard from a lot of people who were sick from getting a shot
+against the flu or COVID, which never happened to me in the past but a lot of
+people in my surrounding. Well not from the shots yeah not even from COVID not
+not not very much but yeah yeah but but I have the impression this time much
+more than last few years but but you can also just get sick without a shot of
+COVID. Yeah okay so let's get started with just and we can over go over it
+quite briefly but if anything is not clear of you you've not seen or don't
+remember that could also be in the context of the previous course that you
+can always alert me to it but just an overview of the different concepts
+related to XML. Did you get to see style sheets and namespaces and XPath and
+things like that? No then we can go over the XML syntax a bit quicker and then
+focus on the other stuff. So XML is already with us for quite some time since
+1997. It's been introduced by the World Wide Web Consortium which also
+introduced HTML and all the web concepts for instance. The main difference with
+HTML is HTML is a language with a predefined set of tags and the tags in
+HTML allow you to impose layout on a document. If you surround let's say a
+number by two by a tag B then the web browser knows that that number should be
+presented in bold on the screen and if you're surrounded by a tag I then it
+knows that it should be presented in italic on the screen. In XML you don't
+have a predefined tag set you create your own tags so that's why the
+abbreviation for XML is the abbreviation for XML extensible markup
+language. It's a markup language in the sense that you surround your text
+content by means of tags, by means of markup but you define your own tags. The
+other main difference is that the tags don't have a layout connotation you
+don't tell how the text should be visualized on the screen in a web
+browser for instance you tell how it should be structured and in that way it
+can still be visualized for a human being it's also machine processable. An
+HTML document if you have tags around a number the browser doesn't know what
+that number whether that number is a shoe size come in no whether that number
+is a shoe size or is a birth date or whatever other number with XML you can
+really say this number is my invoice number and this number is my shoe size
+and whatever other number you want to be present and because of that you can
+tell it in a format it's machine processable so a machine will also be
+able to interpret the text much easier than an HTML document to machine an
+HTML document is just flat text without structure. And as you already know from
+the previous course so XML is conceived as tags where the tags are nested in one
+another and you always have a piece of content in this case a name and then a
+begin and an end tag which has the same label but a slash for the end tag and no
+slash for the begin tag to indicate what the content content is about and the
+tags can be nested in one another such that you can see even if you've never
+heard about XML you can somewhat understand that here you have an author
+with a name and a within that name you have a first name and a last name right
+that's also important for it to be machine processable that these stacks
+should be nested properly into one another so what you can have is for
+instance a name tag and then within the name or a name element and then within
+the name element you have a first name and a last name element that is possible
+something like this is not allowed where you have a begin tag and then an end
+tag and a begin tag of something else and then an end tag and then another end
+tag of something else that's not allowed so either it should be nested like this
+either it should be next to one another and then it can be there's a few more
+syntax rules but these are the the basic ones and that's also the reason and we
+come back to that later why you can interpret an XML document also always as
+a tree structure right you can also include attributes in an XML document so
+within the begin tag you include an attribute name and then a value for each
+attribute so in this case to indicate that author basses also has an email
+address you can also have repeated groups but you cannot have repeated attributes
+so suppose that by basses has two email addresses then you need to model it by
+means of sub elements and now you can discriminate between the two sub
+elements by means of another attribute such as a use attribute for instance you
+can also add comments just like in a programming language and processing
+instructions which are used by applications that process the documents
+for instance to indicate the version of the XML syntax used so that's just to
+illustrate the basic concepts of XML as I said it allows you to impose structure
+on a document you don't tell whether by the basses should be printed in bolt or
+in italic you tell that it's the name of an author and so because of that an
+application can process it in that sense your texts are the metadata just like in
+a relational database the column name and the table name are metadata of your
+data which help the applications to interpret the data a few formatting
+rules or I already said text should start and be closed with a matching n
+tag and should not be overlapping and there's only one root element which also
+helps in the sense that again an XML document can be expressed as a tree
+structure is that more or less clear are there any questions on that so far I
+guess not just an example of a possible database actually the same database that
+is used in different different representations also in the online
+playground both in a relational and few non-relational versions and so also in
+XML actually by basses he passed away he was my co-author he passed away a year
+ago did you get any lectures from him yeah actually at some point he made an
+inventory of his entire wine cellar and put that into a database and so what you
+see here the data here is still his actual wines that he had in his cellar
+so in this case you see that the same data as in the relational representation
+is now represented in XML format and again even without knowledge of XML you
+can see that you have a wine cellar which is the root element consisting of
+multiple wine elements every wine element has a name and a year and a type
+and then a grape with an attribute indicating the percentage so in this
+case it's 100% Chardonnay grape but in this case you have 80% Chardonnay and 20%
+pinot blanc you have a geotag to indicate the location with both a
+country and a region and you have a quantity and again it's understandable
+for a human being but it's also understandable for a machine and so even
+if your data is stored in a relational format if you interchange data between
+two database systems it will often be represented in this way but you can also
+use it as a storage format in its own right okay and so as I said and it's
+easy to see from the nesting of the text in the document you can see that that
+document is actually conceived as a wine cellar root and then the root of a tree
+with multiple wine elements and then every wine element has a name a year a
+type a grape geo and quantity and geo consisting of country and region so it's
+still structured data but it's more like semi structured in the sense that it's
+much easier to for instance have a few wines without a price or with multiple
+grapes in it or with a few other alterations whereas in a relational
+database if you would have that like that flexibility well you don't you
+would need to add columns or delete columns or add another table so it's
+much less flexible more rigid also easier to impose constraints but XML in
+that sense is more flexible that's why we typically speak of semi structured
+data in terms of constraints just like in a relational database you can impose
+constraints on the structure of your XML document and actually in that sense you
+have two types of good XML documents you have to begin with an XML document that
+is well formed which means that it satisfies the syntax criteria of XML
+which means that you can have this type of nesting and this type and this type
+but not this type and that you need a root element and that you need all the
+proper syntax rules of XML but you can also go a step further make a document
+that is not only well formed but that is also valid and valid means that it
+satisfies the constraint as imposed by a type definition just like your
+relational tables in the data in your relational tables satisfy the relational
+database schema in the sense that this particular table should have these
+columns and these columns should have these data types and should have a
+foreign key which refers to the primary key and the primary key should be unique
+etc such kinds of constraints can also be imposed on XML documents and is an
+even else XML document satisfy the constraints for a certain document type
+such as a wine cellar document or an invoice or a purchase order then your
+document is well formed sorry it's valid if it's valid it's always well formed so
+you cannot be valid without also satisfying the XML syntax but valid is
+a stronger constraint and well formed it means that you satisfy the XML syntax
+and that you satisfy the prescriptions for a certain document type and so for
+every document type you need a separate document type definition to impose
+constraints you have two ways to do so one is the oldest one document type
+definition which we go over quite quickly and then in a bit more detail
+we'll look at XML schema definition which is more recent but also stronger
+than document type definition the difference is and again even without too
+much knowledge of XML this is a document type definition where you can see that a
+document wine cellar should consist of a wine cellar element with multiple wine
+elements and a wine element should consist of a name and a year and a type
+and a grape etc and a grape could be repeated because of the asterisk and PC
+data means that it's just string value or a set of characters so without too
+much knowledge and here you indicate that you have a list of attributes
+without too much knowledge you can somewhat understand what is meant what
+is imposed on the documents but the DTD itself is a separate syntax is not an
+XML document more recent specification which also allows to impose more
+constraints is XML schema so XML schema also supports different data types and
+not only at the lowest level PC data which is just plain character strings
+and is itself an XML schema is itself also an XML document so that is
+illustrated in this so this is the schema definition for the wine cellar
+XML document we just showed where you can see that you have a schema which
+consists of an element wine cellar and an element wine cellar by itself is
+complex which means that it consists of sub elements and the sub elements are a
+sequence of wine elements at least zero and at most an unbounded number of wine
+elements and then such a wine element itself is also a complex type which
+consists of a sequence of a name of the type string and which by itself is
+atomic a year of the type short integer a name sorry a type wine type also of
+the type string then an element grape which at least occurs once but you could
+be multiple grapes for the same wine as we've seen in the example and that's the
+definition of the wine elements and then you have a few more to indicate the
+percentage etc the the price of the wine and for every element you indicate
+whether it's complex which means it's consists of sub elements or if it's not
+then it's consists of a base type and you can also have attributes in this
+case the currency of the price is an attribute which is optional and in the
+end you have again or geo definition with two sub elements country and region
+which are both of the type string and so you can see in a more eloquent and or
+more detailed way that with the DTD in an XML schema you can impose how a wine
+seller document should be structured you have a question if the wine seller
+documents refers somehow you seem to trick me to think so if a wine seller
+document refers to a schema then it can be tested against that schema if it
+satisfies this it means it's not only correct XML syntax but it's a correct
+wine seller document according to the prescribed structure and then if you're
+application knows upfront what to expect based on the schema and you get some
+document like that it will know how to process it because you impose the
+correct structure on the document one last thing to notice here is that an XML
+schema in contrast to a DTD is by itself also a well-formed XML document so it
+satisfies the XML structure by the way which is also the case for your
+metadata in your relational database so in a relational database the metadata
+that's in prescribes the database structure of user database is also
+stored in relational data in relational tables so also as a relational structure
+in the same way the metadata that prescribes your XML document is also
+structured as an XML document is that clear one more thing to notice yeah you
+have the processing instruction to indicate the version of the XML
+document you also have this reference to what is called a namespace by means of
+the label XML and s which stands for namespace we come back to that in a
+minute a namespace allows you to separate XML
+text with the same name because that's of course a problem in this XML document
+I have attack element which is part of my XML schema to indicate that there are
+different elements in my wine cellar but of course if I have an XML document on I
+don't know some mathematical studies and onset theory you will also
+have attack element which has a completely different meaning and if you
+have an XML document on some on some chemical formulas it will also talk
+about chemical elements and again completely different meaning so how to
+separate one element from the other and the different meanings of attack element
+which could be defined by different entities because everyone can define his
+own text that can be done by means of a namespace but we come back to back to
+that in a minute it's XML schema clear and you can have a look later on to see
+all the nitty-gritty details but the overall concept I guess is quite okay
+another XML related specification which also is expressed itself as an XML
+document or style sheets what is a style sheet and a style sheet allows you to
+impose a layout on an XML document just like you impose a layout well in an HTML
+document your layout is already embedded in your document you have tags that say
+this should be in italic and this should be in bold but you can also have an
+overall layout in a separate style sheets the same can be done with XML
+with the difference that in XML you don't have any layout related text in
+your actual document itself the layout is separated in a separate document and
+in that way you can impose completely different layouts on the same document
+by applying a different style sheets actually style sheets as multiple
+components only one of them is relevant for us which is XSLT the other one is
+really gotten out of use it's still being used but the development is being
+discontinued but this one is very much alive XSL transformations XSLT and what
+XSLT actually does is again in an XML document layout a set of rules how to
+transform one document with a certain structure and a certain set of tags into
+another layout with a different structure or set of tags and you can have
+multiple kinds of outputs but the most important ones for us is on the one hand
+another XML document but with a different structure and on the other
+hand an HTML document so a style sheet allows you to transform an XML document
+in an HTML document and in that way you have a visualization of your XML
+document because an HTML document has a layout which can be visualized in a web
+browser or in your word processor or whatever but it could also be that you
+have an XML document with a certain structure and you have an application
+that expects a different structure then you can transform your document into
+that different structure also by applying an XSLT transformation and so
+the rules how to transform your document these are laid down in your XSLT
+document which itself is also an XML document so that is illustrated here
+suppose that we have our wine cellar document we already have showed before
+but it's a bit long and we want a shorter version of it with not too much
+details just a limited number of details then we can create a style sheet that
+transforms the first wine cellar document into another wine cellar
+document with a different structure and that's what we do here so we indicate
+that we'll be creating a wine cellar summary document where we start from the
+wine cellar document and the wine elements in that document and so for
+each wine element in the wine cellar we take the name and we surround that by
+the text name and the value of it will be put in the new document and in the
+same way the value of quantity will be put in the new document surrounded by
+quantity tags and that's it and this will be done for each wine element and
+that's the end of the style sheets and if we apply the style sheets then we get
+this document which is a simpler version so we transformed an XML document into
+another XML document with a different structure and this already indicates
+this is much more flexible and much easier than restructuring your relational
+database for instance it's just applying a style sheet and so it allows you to
+use the same document as a source for different applications even though the
+different applications might expect completely different document formats
+right and again if you look at the style sheet again you see it's again a
+well-formed XML document which actually satisfy or corresponds to another
+namespace the XSL transformations namespace to make sure that's text like
+templates and for each that they are within the XSL namespace and in that
+sense you can discriminate them from text with the same name but belonging to
+a different namespace but we come back to that in a minute and the same can be
+done if you want to generate not another XML document but an HTML document and
+then you will be actually applying a layout to your XML document that's what
+we see here so we have a style sheet that again starts from the same wine
+cellar document but now we surround it by tags that are actually HTML tags so
+we start with just a header of level one my wine cellar and then a table layouts
+which starts with a color and then a table header and then rows in the table
+and every row in the table will be based on a selection in the wine cellar
+document and the wine element within that wine cellar document and we select
+the name and the year and then we also select the quantity and then we close or
+for each tech and so as a result we'll be generating an HTML document with a
+table that contains some data from the XML document and so the output of it is
+indeed this document which is indeed an HTML document which doesn't have any
+structural metadata anymore but has layout metadata indicating how the data
+should be visualized and if you open that in a web browser you get something
+like this the advantage of that is also that you can define your documents once
+with a certain structure and then you can apply different style sheets that
+generate a definite HTML outputs and so you can impose different outputs to the
+same XML document for instance a visualization for a smartphone and one
+for a web browser and one for a printed layout but you just need to make to make
+up your document only once and just slap a different style sheet to it whereas in
+HTML in essence you would need to create the same document in multiple ways with
+multiple HTML formats in it so you really separate the layouts from the
+actual structure of your documents
+is that clear
+and then we come back to what I already mentioned the namespace element so as I
+said I said they say in Dutch anyone can create one's own text in HTML you cannot
+because the text in HTML are part of the actual standards in XML is actually a
+language to create your own text but of course you cannot avoid that different
+people will all use the same text but in a different context and with a different
+meaning and to discriminate between them you have the concept of namespaces and
+namespaces is actually a very simple concept you prefix every one of the text
+and you associate the prefix with the unique identifier unique in the context
+of the World Wide Web and unique in that sense is what is called a uniform
+resource identifier which could have multiple formats but which in practice
+mostly has the format of a URL uniform resource locator let's say a web address
+what the actual address is is not very important so you could even have a URL
+that refers to an address where no web page can be found the only thing that is
+important is that URL is a way of uniquely identifying an address on the
+web and you don't have two addresses which are the same so if you associate
+your text with URL then you associate them with a unique identifier and then
+one element tag with one identifier will still be different to another element
+tag with another identifier and you can discriminate between them so that's
+illustrated over here and you you've also seen it in the previous examples
+you concludes within your tag definition you can have an XML NS prefix referring
+to some unique identifier a unique URL whether that URL actually exists or not
+is not relevant so it's just a unique address there shouldn't be a web page
+over there but the only thing is it's a unique way of identifying your prefix
+and then you can prefix your text with Bart NS and because of that you can
+discriminate this wine tag and name tag and year tag from another wine and name
+and year tag made by someone else but with a different namespace but in many
+cases if you go to that very address you'll see some explanation of what is
+meant with the namespace but it's not mandatory so if you would go to for
+instance if you look at XSL T the namespace for XSL which is this one is
+also a unique identifier but if you go to the address you also see the
+specifications of XSL transformation in the same way if you look at the
+namespace for XML schema if you go to the address you find the specification
+of XML schema but again it's not not a necessity the only thing that is
+relevant is this URL is different from another and because of that your text
+will be different from other text
+there's also an abbreviation in the sense that if you have a wine cellar with a
+reference to a namespace and then within that wine cellar element the other
+elements don't have a prefix then automatically the parser will assume
+that the default namespace is used so that you don't necessarily need to
+prefix all your texts only if they are different than the default namespace okay
+is that more or less understandable and then one more specification in the
+context of XML is and it's something that we'll be extending on later when
+we'll be actually querying XML documents this is not a query language but
+just a way to refer to one particular element within your document knowing
+that the document has a tree structure and so XPath exploits that tree
+structure to refer to one particular note in the tree that your XML document
+is and in that way you can yeah just like you refer to a cell in a relational
+table you can refer to one particular note in your XML document so without
+going into too much syntax details you start from a document with a certain
+name in this case or wine cellar document use automatically you go to the
+roots you go to the wine cellar element and from the wine cellar element you go
+to the wine element and so by means of this XPath expression you go to the
+first wine element within the first wine cellar element within the wine cellar
+document you come across you can also explicitly refer to in this case the
+second wine element so in this case you will go to the first wine cellar
+element and within that first wine cellar elements to the second wine
+element and that one will be retrieved and you can also well it's not a real
+query language but you can also already impose some selection criteria in this
+case you refer to the name of the first wine element within the first wine
+cellar element you come across where the price is higher than 20 for instance
+but we'll see how you can properly query an XML document this is not really
+querying but just referring to a particular element okay okay so these
+were some specifications related to XML again it's not all the details it's just
+for you to be able to position them and now they fit together next question is
+of course how you can process XML documents because I said it has
+metadata in it which makes it machine processable an HTML document is only
+machine processable in the sense that the machine should be a web browser and
+a web browser knows what to do with B tag and an I tag and some other texts
+that are part of the HTML standard and knows because of that how the document
+should be visualized since you can create your own text with XML you don't
+have a uniform application that can work with any XML document you need tailored
+applications for a particular kind of document and they know whether they
+receive the correct kind of document by means of checking it against an XML
+schema but what is still generic to XML processing is the XML parser so the XML
+parser is the component that will you could say unravel your document into
+individual elements and present them in a particular way to your application to
+be processed but then how it should be processed that's part of your
+application logic and that will hopefully be different for a wine cellar
+and for a purchase order and for a degree document or whatever so the
+standard process of processing XML documents is you feed the XML documents
+to a pipeline of components first one in the pipeline is your XSLT processor if
+any that might transform your pro your document I suppose that's your
+application expects a different format than the one you have generated then you
+can transform it to the appropriate format by means of an XSLT style sheet
+you take an XML document as inputs and another format of XML documents as
+outputs and then you have the XML parser that will unravel the documents at least
+it will check whether the document is well formed which is a quality check to
+avoid that your application will run into trouble because of faulty inputs so
+if the document is not well formed it will not be accepted but your parser
+could also if the document refers to a document type definition or an XML
+schema it will also validate the document check whether it's not only
+well-formed but also valid whether the wine cellar satisfies the constraints
+for or the schema for a wine cellar document again if it's not valid the
+documents will be rejected if it is valid then the parser knows that there's
+nothing wrong with the document and it can be safely presented to an
+application and then it will be transformed in a format for a particular
+API a particular type of application programming interface which determines
+how the document can be accessed by your application and you have different types
+of API's but to let's say two extremes and also two standard ones the DOM API
+and the SACS API anyone heard of DOM or SACS DOM is actually the richest DOM
+will represent your XML document as a tree of objects of interrelated objects
+so that's explained here but typically they're conceptually the representation
+your application will get is something like this every component of your
+document both an element but also the content of an element will be an object
+the objects will be interrelated will be programming objects in a programming
+language Python or in Java or C++ or whatever and so you can access these
+objects by means of an interface an interface with a set of methods to
+manipulate the objects so in this case of course it's a very simple object
+structure based on a very simple XML fragment which is by the way not
+necessarily a complete document it's just a fragment but an entire document
+could be represented in this way and then your objects have methods to
+manipulate the document to read the contents to prune and graft and move one
+element of a tree to another location in the tree to delete a subtree to add an
+element in the tree etc etc so you can completely manipulate your document by
+means of metatimvocations of objects that's the most expressive way and then
+you can really refer to individual components interact with every possible
+component of your documents which works well if the document is not too big but
+if you have not a simple document but a whole dump of XML data from a database
+for instance then it might be too much to load in into internal memory and then
+you need a different type of API and so the other extreme is the sex API which
+is much simpler and which because of that not unsurprisingly is called sex
+simple API for XML and with sex your document is not represented as a tree of
+objects but as a stream of events and so as the document is parsed by the parser
+every time the parser comes across an element or the content of an element it
+raises an event and then these events can be captured or not be captured by
+your application and so the application can just listen for events that is that
+are relevant to the application and based on that you can for instance
+process an entire stream of XML content that comes out of a database but also
+for instance XML data that come out of a series of sensors that in real time send
+out data about whatever measurement in XML format and so you see these data
+stream by and an application can capture them for instance every time that's an
+element a wine is streaming by from before 2010 it can for instance take
+action on that particular elements and in that way of course you don't need to
+load your entire documents into internal memory so it's more simple but of course
+it's a stream of events that passes by so you cannot return in the stream it's
+just something that's streams by that's what the stream does of course so it's
+a completely different programming model what is appropriate depends on the
+application of course any questions no questions just for the sake of
+completeness you have other API's as well but these are the most standard
+ones and you have some variations on them maybe also stacks is worth
+mentioning this is kind of an a compromise between the two streaming API
+for XML which were you so with Dom actually you pull the documents or the
+the tree structure out of the document and then you can manipulate it with sex
+you see the the events streaming by and you can act upon them with stacks
+streaming API for XML you can pull a subset of the data out of the stream by
+means of a cursor mechanism just like you do with a relational database
+interface so if from an application you execute a query against the database
+which could have a very large result you have a cursor mechanism that allows you
+to scroll one by one through the lines that are in the query result here also
+you have a cursor mechanism that allows you to scroll through the different
+events that come out of the stream so we have some control at the application
+level but it's still a stream of events but so the main extremes are sex and
+object-oriented and event-oriented okay so this was an introduction to already
+indicate that you can do a lot with XML apart from storing it but of course this
+wouldn't be a database management course if we wouldn't attempt to store the XML
+into the database that will be for after the break but first after the break
+we'll discuss some sample exam questions from the physical database organization
+part see you in ten minutes
+okay let's have a look at some sample exam questions so these were questions
+that were asked in the past years but of course this was a tree credits course so
+then we had typically at three questions at least one of them was more practice
+oriented in the sense that you got a question with a very simple case is a
+big term but a real-life situation then another question how to deal with that
+will come with some sample questions in that department later on these are more
+theoretical sample questions probably for this exam at least for the ones
+taking the six credit version of the course you will get more than three
+questions but this is just to get an idea of the type of questions that were
+asked in the last few years so decide between a multi column index or multiple
+circle column index which criteria would you use attempts to an answer we want
+who wants to try it's quite straightforward out of the subject
+matter
+who prepared the questions
+but you can still try based on the lectures so it's not that hard let me
+try that well as we said multi column indexes if you want to very efficiently
+execute always the same kind of query with the same attribute types involved
+then a multi column index is the most efficient because then you have a single
+index that comprises all the selection criteria so one question could be is
+there any volatility in the types of attributes that are involved in the
+query if it's not then a multi column index could be very appropriate but if
+sometimes you will be using only a subset of the attribute types you are
+about to include in the index as we have seen then typically you're better off
+with multiple single column indexes especially if which are in attributes
+are used and which are not used is also different from case to case because you
+can work with a subset if you can include them all of them in the leftmost
+columns of your index so if it's always more or less the same subsets then you
+can still work with a single with a multi column index but if it's if you
+have a lot of attribute types and sometimes it's this subset and then
+that subset you're much better off with a multiple single column access right
+I'll go over it quite quickly because I well if you prepare it we can discuss it
+but now I just give an idea of how you would answer random file organization
+and impacts on and which elements have impact on the number of random and
+sequential block accesses to retrieve a record according to unique key first two
+elements of course are on the one hand the distribution of your keys and on the
+other hand the hashing algorithm so the examples we saw you generate a set of
+addresses out of your input set of keys the range of addresses but also whether
+they are uniformly distributed based on the key values very much depends on the
+key set but also on the hashing algorithm and so one algorithm could be
+appropriate for one key set and not for the other so these are two elements and
+then of course how you deal with overflow because if there's no overflow
+then only one random block access and at most a few block accesses sequential
+block accesses to retrieve the record according to the unique key and that
+depends on the bucket size but if there is overflow more random block accesses
+could be involved and then the overflow handling technique comes into play as
+well and one other element that will impact the number of block accesses is a
+factor that will impact the amount of overflow records and the more overflow
+records you have the more unnecessary block accesses one other element that
+comes into play is a loading factor because even if you have a very bad
+hashing algorithm but you have a very low loading factor then typically your
+buckets will not be very much filled and then you might still not have a problem
+of overflow apart from the fact that you are not using your storage capacity very
+efficiently and then the third one explained by means of a concrete example
+which properties of a B+ tree have impact on the number of random or
+sequential block accesses needed to retrieve a record according to a non
+unique key well we've seen in any case you need to descend entirely into into
+the B+ tree because in contrast to a B tree the links to the actual data
+records are only in the leaf nodes so you cannot be lucky or unlucky you
+always have to descend into the tree so the height of the tree is already a
+factor that comes into play and the height of the tree of course depends on
+on the one hand the size of the nodes in the tree and on the other hand the
+number of key values that you need to get stored into your tree and then
+another element that comes into play it's a non unique key so you start
+typically from the first record that satisfies that particular key value but
+there could be more if your index is a clustering index it means that the other
+records are physically together so they are as much as possible in the same
+blocks so you only need a few block accesses to retrieve all of them if on
+the other hand it's a non clustering index your records will be stored across
+the entire file so you might need more block accesses if you're very unlucky
+every possible records will be that classes that qualifies will be in a
+separate block so you might need as many block accesses as there are records that
+satisfy the query by accident some of them could be in the same block but if
+you have a clustering index then all of them are clustered in a few blocks so
+that's also something that comes into
+is that more or less clear for the three of them it's just a brief answer and you
+could tell a few more things but that's the basics of it questions illustrate by
+means of two concrete examples a situation where a full table scan would
+be more efficient than use of a secondary index in a situation where the
+opposite would be true yeah I will not come with a very concrete example but
+any example where you have a query where most of your records qualify could
+typically be a situation where the full table scan would be more appropriate
+especially if the index you do have is a non clustering index then you probably
+will have to retrieve most of the records anyway and then an example of
+the opposite is well the opposite where you have a section criterion which is
+very selective and then typically you're better off with an index even if it's a
+non clustering index you will still reduce the number of block accesses
+similarities this is quite recent similarities and differences between Sun
+and NAS who wants to tackle that one
+surprise me and come up with an answer that's the main difference although well
+in theory and we've seen three criteria one of them similarity it's network
+attached in both cases as you said in most cases in Sun it will be a separate
+network and in NAS it will not be although in theory you could use a NAS
+in a separate network as well but in most cases it's not but so if you look
+at the three criteria one of them that is not a difference but the similarities
+they're both network attached with a Sun you have a different network technology
+of different medium than with your local area network you have fiber channel for
+the storage network and ethernet for the local area network and so that's a
+difference and third criterion is also a difference Sun is block level access
+whereas a NAS is file level so you will be plugging something that could be seen
+as a very simple file server into your network so that's also a difference if
+you want to really impress me you could also say yeah but that's not entirely
+true in the case of a Sun you could also use ethernet technology but then you have
+iSCSI that could be an addition to the story okay and then the last one concepts of RPO and RTO what was the
+difference there again if you want to qualify so yeah correct and are there
+correlated positively or negatively yeah well there they can be impacted by the
+same factors but it could be in the same direction and could be in a different
+direction to give an example very simple example suppose you have a backup system
+on tape and you replace it by a backup system on disk then you can take more
+frequent backups so your RPO will improve and you can also bring it much
+quicker back online restore the backup then with the tape so the RTO will also
+improve so in that sense the same change will impact them both in a positive way
+but it could also be negatively correlated for instance to give an
+extreme example you could say screw my past data I just want to bring my system
+back online and I don't want to restore most recent data and then your recovery
+time will be affected positively but recovery point will be impacted
+negatively so it could be in both directions it's not there's a systematic
+correlation between the two in one direction or the other but they could be
+impacted in different or in the same directions by one particular measure is
+that clear okay just to remind you that's in the online tool that the
+playground you can still check not these kinds of questions but just multiple
+choice choice questions for the for your understanding of the concept which you
+can do in between by the way my my co-author had to update a website
+yesterday because of the PHP issues so everyone was affected mostly so some
+other sample questions and also these were just for the first section of the
+course but some typically some chapters that will draw from multiple sections
+we'll come back to these once we've discussed a few more chapters in the
+course okay back to XML were there any questions on the first XML parts no
+questions so let's move on to storage of XML documents and actually there's three
+possible approaches the document oriented approach the data oriented
+approach and the combined approach what is the difference with a document of
+oriented approach you might already guess the document structure itself is
+important and in that sense you start a document in such a way that once you
+retrieve it if you round trip it you store it into the database and you
+retrieve it again it's still the same document and you store it more or less
+as a whole into a relational database or dedicated document store with the data
+oriented approach you are not that much interested in the document as such with
+only in the data in it and it means that's only the data are stored it also
+means that if you run strip it you store it into the database and you get it out
+again you have the same data but not necessarily entirely the same document
+structure and with a combined approach you have some combination of the two
+what do we mean by that in practice with the document oriented approach if we
+look at a relational database and XML documents will typically be stored as a
+blob or a seal remember what we discussed in the last lecture on object
+relational databases one particular user-defined type so beyond the
+standard built in types of the relational model is the blob or in our
+case especially the seal up a character large object which means that you store
+a large text into a single cell into your table hey you have a column
+definition and the data type of that column is seal up and so every cell in
+that column will be a document which could be an XML document which also
+means that for the relational database system or the object relational database
+system it's just considered as a text not as something that can be further
+queried by by relational query languages such as SQL it's treated upon as a full
+text search but what you can typically do is typically you have user-defined
+functions to search in that object for the presence of a certain term or string
+and so if you like look at it schematically you have a table and for
+instance suppose that you have a table with I don't know HR data data about all
+your stuff and one of the columns is a seal up that will contain the the resume
+of every staff member which is stored as an XML document and you think okay the
+document as such is important and not only the birthday but the document as it
+was provided by the staff member then every cell in this column will be an
+XML document which you can store and which you can retrieve you can with
+basic sequel do nothing more than that because the cell is the most atomic
+value that you can manipulate by means of sequel but you might have user-defined
+functions to look for a certain search term within that text but with sequel
+you can nothing do nothing more than that an alternative to that is that you
+have a particular data type which is not a seal up but which is really an XML
+data type and then it's acknowledged by the relational database as XML we come
+back to that in a minute because that's an extension to the sequel language
+called sequel / XML which provides a few features but one of them is a data type
+which is more than a seal up in the sense that your your value of yourself
+is that not treated as unstructured text but as XML data and then you might
+manipulate it by some more specific user-defined functions for instance to
+apply an expert to retrieve one particular element within your XML
+documents but for the relational perspective this is just one big chunk
+of data it's sequel you cannot do nothing more than retrieving individual cells is
+that clear but in many cases if your document is really important then that's
+the way to go and so more and more relational database systems will provide
+features to do that so apart from the standards relational data types you have
+a seal up or even a sequel XML data type such as the database system knows that
+this value is actually an XML document or at least a text document something
+similar you have but that's for the next lecture in document stores which are not
+relational databases but which are really meant as an environment that is
+tailored to XML storage or to JSON storage because the same goes for JSON
+okay this typically works well if the document is important but also if the
+document is more or less static if you don't want to manipulate its contents
+too much or at least if you want to manipulate it it will not be my be my
+means of sequel but by means of user-defined functions to impose
+instructions on your XML structure the other extreme is the data-oriented
+approach there you will be what is called in in the field shredding the
+document so literally you shred it into pieces and the pieces are stored in
+individual cells in the table so you have your relational table you have your
+documents with all kinds of elements in it and based on some mapping these
+elements will go all to all kinds of different rows and or columns or even
+different tables and so every bit of information in your document is put in a
+different cell and if you do it like that of course you can query the
+individual cells by means of sequel sorry so you can really retrieve
+individual yeah values from your document because the values are now in
+individual individual cells in your relational table but as I said it could
+be depending on how the mapping works and we come back to that later if you
+round-trip the document so you store the XML into the database and you retrieve
+it again as an XML that it's not entirely the same document structure you
+have the same data and it's but not necessarily the same document structure
+but in many cases that's not important for instance in our wine example you
+just want to know about the wines not necessarily about the document structure
+and so this is typically recommended if the data itself is important and also if
+you really want to manipulate the data or retrieve them in a fine grained
+fashion at a level of individual cells by means of sequel and not by means of
+any XML oriented manipulation language and so in that case you need some
+transformation to transform your XML structure into a relational structure
+you will be shredding your document your individual elements into parts that are
+stored into the database how you do that shredding you have different ways to do
+so we come back to that later it has to do with the difference in structure
+between relational model and XML model but in the end both are structured or at
+least semi structured data so you can map from one structure to the other but
+there's different ways to do so is that clear and then you also have some in-between approach
+where some parts will be stored as XML so some parts will be stored like this
+and some will be stored as values in your cells think of a document for
+instance an insurance claim you ran into another car or the other car ran into
+you or a tree ran into you or you ran into a tree and you on the one hand have
+some very structured information like the date when it happens and your
+insurance claim number and your insurance contract number and your
+address etc that could all be in parts that are shredded into individual cells
+and can be retrieved by means of sequel but it could also be that you have some
+explanation of what happens in an XML format but which is more prose and just
+a few XML tags with a lot of text and that can be stored as a single fragment
+XML fragments into into the database or suppose you have an XML document with
+all your employees and some employee information is just structured data in
+terms of name of the employee and employee number and then you have the
+resume which is more like a freeform XML document where the XML the structure is
+important and you store the resume like this and the other data you shred them
+into pieces into your relational structure and then you can also query
+them and then for the employees that are relevant according to the sequel query
+and according to these criteria you can also retrieve the resume but then that's
+just that's from sequel perspective the smallest part you can retrieve one
+important aspect is also in terms of choosing that if you shred your entire
+document so if you have this approach if you want to recompose the documents as
+an entire XML document you're not interested in just the parts but you
+want to retrieve everything together you need to do a lot of joints between
+different tables typically which is expensive and that's why from a
+performance perspective it might also be a good idea to maybe not shred entirely
+but just shred up to a certain level and still keep some XML documents fragments
+being stored as XML and not as relational data in many cases your
+database management systems itself will either look for based on past usage of
+the data for an optimal shredding level or we'll just store both versions so
+we'll try to shred the document but also store it as a whole and then depending
+on the type of query and what you are retrieving and the atomicity of the data
+you are retrieving it will use one version of the other so there could be
+multiple ways to do so but it's good to understand at least what happens even
+if it's automated any questions there
+okay so that being said you can store them in different ways if you just store
+them as an XML look and then that's it if you shred them into whatever level of
+depth then you need somehow map your XML structure to relational structure and
+the good news is both of them are structured formats or see my structured
+formats in the case of XML the bad news is that the way in which the data is
+dealt with the structure is dealt with is very different and because of that
+you need to overcome these structural differences a bit like you need to
+overcome the structural differences between objects and tables in an object
+relational mapping layer but the differences are much bigger even in an
+XML setting so the building block of a relational model is a metamatical
+relation with one or zero one or more and ordered tuples each tuple consists
+of one or more attributes which is already a difference between XML and
+relational model because in XML your elements are sorted so the ordering is
+important the first wine and the second wine cannot be switched in that case you
+have a different XML model in a relational database your tuples are not
+ordered they can maybe physically be switched but logically there's no
+ordering so if you want to come overcome that difference you need to add an extra
+attributes in your relational database to indicate the order of the tuple
+within the whole construct in line with the ordering of your wines in your wine
+cellar for instance or and that's something that happens a lot in what is
+about to come as well you can use an object relational database system which
+can cope with a lot of the structural differences because object relational
+database system does have collection types where the list is indeed an
+ordered set of elements and so there you can directly model that ordering there's
+quite a few other structural differences and again in many cases an object
+relational system at least will soothe the differences to some extent so
+relational model does not support nested relations because of the first normal
+form nested relations which is the same as composite attributes whereas in XML
+everything is about nesting a your you have a hierarchy structure something
+like this a tree structure which is all about nesting your hierarchy is about
+one element being nested in another in another and another which is not allowed
+in a relational setting how do you cope with that again object relational
+databases supports that kind of nesting in a relational database you will be
+working with a separate table and foreign keys but then you just have a
+relationship but not necessarily a part of a part of relationship as we
+explained last time and on the other hand speaking of first normal form a
+relational model does not support multivalued attribute types whereas XML
+does allow multiple child elements to the same parent elements I think of for
+instance multiple telephone numbers for the same person again in a relational
+database you need an additional table in an object relational database you have
+collection types which allow for multivalued attributes so the shredding
+will be less deep in an object relational database typically in a
+relational database you will have a lot of tables to cope with your XML
+structure is that clear a relational database only supports atomic data types
+and not composite data types in if it's not an object relational database
+system so only the built-in type such as integer string data etc XML doesn't have
+any basic types or normal XML document everything at the lowest level is just
+characters document type definitions also only understand parsed character
+data so PC data stand for parts corrected data which is just strings so
+these doesn't that one doesn't discriminate between atomic data types
+either XML schema schema does so if you look at schema definition for a wine
+cellar you see the difference between a value that is a string and a number and
+a boolean and a date etc and of course you can also define aggregated types
+because your entire tree structure is an aggregation of different elements so in
+object relational extensions you can model that to some extent by means of
+user-defined types in a basic relational database you will need to map it to
+multiple tables how that mapping happens we come back to that in the next session
+and then maybe the most important difference XML is see my structure so
+you can have a lot of anomalies missing values repeated values some parts that's
+depending on your schema definition are not always the same in a relational
+database that's not allowed it's much more rigids and if you want to change
+something you really would need to regenerate your table structure and
+repopulate your table which is much more expensive of course in terms of
+performance than in an XML schema on the other hand of course rigidity is not bad
+it's about stronger enforcement of constraints and in that sense
+guaranteeing that the data quality is good but of course it's less flexible so
+it depends on what's most appropriate for you these are just a few differences
+so the next question is how to cope with these differences but are there any
+questions so far everything clear so the next question is how to map your XML
+documents to a relational structure or vice versa so you have different mapping
+techniques that map from relational to XML or from XML to relational according
+to very different paradigms so table based mapping starts from your
+relational structure and will be very deterministic in terms of the XML
+formats that can be used the schema oblivious mapping does more or less the
+opposite starts from your XML structure and will impose a very rigid relational
+structure the schema where mapping starts actually from the domain model
+behind your schema or your relational database so if you have a schema with
+wines and from that you derive that you have a conceptual model where a wine has
+a geo information and the name information and apprise information and
+from that conceptual level you translate it to a relational model then you have
+your database structure and in that sense the mapping happens at a
+conceptual level rather than at the structural level so that's a third
+possibility and then the fourth possibility is to use what I already
+referred to SQL XML which is an extension to the SQL language to cope
+with XML data in a relational database and which has multiple purposes I have
+to leave a bit earlier today so maybe just a few words about the table based
+mapping which is as I said very rigid in the sense that you start from your
+relational structure relational structure means that you have tables and
+rows and columns and cells and based on that you have you generates an XML
+structure that preserves the concepts of databases and tables and rows and
+columns and cells and then you get a structure like this which is of course
+very rigid if your application expects something completely different you can
+still transform it afterwards but as a basic structure it really reflects the
+relational model so it's rigid on the other hand it could be very useful for
+instance if you use XML as a format to do a dump from your relational database
+or maybe if you want to migrate data from one relational database to another
+you just dump it into an XML format it's still essentially in a format of columns
+and tables and rows and you can just take it into a similar structure into
+another relational database and you migrate data from one to the other so
+it's not too far-fetched but of course it doesn't work if you want to be very
+flexible in how you structure your XML document this is really dependent on
+your database structure you could still change the name say instead of column
+you could have I don't know first name and instead of column one you could have
+last name but in essence it reflects the structure of tables and rows and cells
+and in that sense it's really bound by a relational model but as I said if you
+don't mind or if you use it to pump data from one database one relational
+database to the other that's the easiest way to work it's very deterministic okay
+the other ones will be discussing next week but as I said not next Tuesday but
+next Thursday I put a reminder in Toledo and before the week after that the
+Tuesday's lecture I'll inform you about whether the noise will still be there or
+what if it is then we move to a different room but we'll see how it
+works see you then
